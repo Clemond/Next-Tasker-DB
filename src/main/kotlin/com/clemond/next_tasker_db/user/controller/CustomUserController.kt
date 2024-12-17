@@ -1,8 +1,10 @@
 package com.clemond.next_tasker_db.user.controller
 
 import com.clemond.next_tasker_db.user.model.CustomUser
+import com.clemond.next_tasker_db.user.model.LoginRequest
 import com.clemond.next_tasker_db.user.repository.CustomUserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.annotation.Validated
@@ -38,6 +40,20 @@ class CustomUserController (
     fun getAllUsers(): ResponseEntity<List<CustomUser>> {
         val users: List<CustomUser> = customUserRepository.findAll()
         return ResponseEntity.ok(users)
+    }
+
+    @PostMapping("/login")
+    fun loginUser(
+        @RequestBody loginRequest: LoginRequest
+    ): ResponseEntity<String> {
+
+        val user = customUserRepository.findUserByUsername(loginRequest.username)
+
+        return if (user != null && passwordEncoder.matches(loginRequest.password, user.password)) {
+            ResponseEntity.ok("Login successful!")
+        } else {
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials")
+        }
     }
 
 
