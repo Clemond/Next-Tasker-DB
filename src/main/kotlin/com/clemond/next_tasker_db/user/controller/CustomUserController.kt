@@ -25,7 +25,12 @@ class CustomUserController (
         customUserRepository.save(newUser)
 
         return ResponseEntity.status(201).body("user was successfully created")
+    }
 
+    @GetMapping
+    fun getAllUsers(): ResponseEntity<List<CustomUser>> {
+        val users: List<CustomUser> = customUserRepository.findAll()
+        return ResponseEntity.ok(users)
     }
 
 
