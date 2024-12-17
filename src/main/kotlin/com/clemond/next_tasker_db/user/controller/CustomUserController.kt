@@ -4,6 +4,8 @@ import com.clemond.next_tasker_db.user.model.CustomUser
 import com.clemond.next_tasker_db.user.repository.CustomUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -13,16 +15,21 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/user")
 class CustomUserController (
-    @Autowired val customUserRepository: CustomUserRepository
-    // TODO - Add passwordEncoder
+    @Autowired val customUserRepository: CustomUserRepository,
+    @Autowired val passwordEncoder: PasswordEncoder
 ){
 
     @PostMapping
     fun saveUser(
-        @RequestBody newUser: CustomUser
+        @Validated @RequestBody newUser: CustomUser
     ): ResponseEntity<String> {
 
-        customUserRepository.save(newUser)
+        val bcryptUser = CustomUser(
+            newUser.username,
+            passwordEncoder.encode(newUser.password)
+        )
+
+        customUserRepository.save(bcryptUser)
 
         return ResponseEntity.status(201).body("user was successfully created")
     }
