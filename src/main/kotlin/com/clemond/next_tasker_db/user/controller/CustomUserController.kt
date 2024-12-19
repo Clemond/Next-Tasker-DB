@@ -47,7 +47,7 @@ class CustomUserController (
         @RequestBody loginRequest: LoginRequest
     ): ResponseEntity<String> {
 
-        val user = customUserRepository.findUserByUsername(loginRequest.username)
+        val user: CustomUser? = customUserRepository.findUserByUsername(loginRequest.username)
 
         return if (user != null && passwordEncoder.matches(loginRequest.password, user.password)) {
             ResponseEntity.ok("Login successful!")
